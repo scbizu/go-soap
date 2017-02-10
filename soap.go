@@ -3,7 +3,6 @@ package soap
 import (
 	"bytes"
 	"encoding/xml"
-	"log"
 )
 
 //Envelope defines the soap envelope column ,
@@ -53,12 +52,9 @@ func (env *Envelope) WriteEnvelope() ([]byte, error) {
 
 //ReadEnvelope decode the soap structure .
 func (env *Envelope) ReadEnvelope(responseBody []byte) error {
-
 	err := xml.Unmarshal([]byte(responseBody), &env)
 	if err != nil {
-		log.Panic(err)
 		return err
 	}
-
 	return nil
 }

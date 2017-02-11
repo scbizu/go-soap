@@ -1,6 +1,7 @@
 package soap
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"testing"
 )
@@ -32,8 +33,8 @@ func TestReadEnvelop(t *testing.T) {
 		SavePushInfornationResult string   `xml:"SavePushInfornationResult"`
 		StrErrMsg                 string   `xml:"strErrMsg"`
 	}{
-		SavePushInfornationResult: "123",
-		StrErrMsg:                 "123",
+		SavePushInfornationResult: "test",
+		StrErrMsg:                 "test",
 	}
 
 	en := NewEnvelope(WebMethodRes)
@@ -41,18 +42,23 @@ func TestReadEnvelop(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = en.ReadEnvelope(response)
+	// t.Log(string(response))
+	needsNode := make(map[string]interface{})
+	needsNode["ns"] = "http://tempuri.org/"
+	needsNode["Child"] = []string{"SavePushInfornationResult", "strErrMsg"}
+	needsNode["Root"] = "SavePushInfornationResponse"
+	res, err := ReadEnvelope(response, needsNode)
 	if err != nil {
 		t.Error(err)
 	} else {
-		t.Log(en.Body.Data)
+		t.Log(string(res))
 	}
-
-	err = xml.Unmarshal([]byte(en.Body.Data), &WebMethodRes)
+	var resmap map[string]string
+	err = json.Unmarshal(res, &resmap)
 	if err != nil {
 		t.Error(err)
 	} else {
-		t.Log(WebMethodRes.SavePushInfornationResult, WebMethodRes.StrErrMsg)
+		t.Log(resmap["SavePushInfornationResult"], resmap["strErrMsg"])
 	}
 
 }
